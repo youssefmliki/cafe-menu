@@ -1,0 +1,45 @@
+name: Sync Menu Bas
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+    - cron: "0 16 * * *"
+    - cron: "58 22 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "source/**"
+      - "MENU_HAUT.pdf"
+      - "scripts/sync_menu_bas.py"
+      - ".github/workflows/sync-menu-bas.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-menu-bas
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync published MENU_BAS.pdf
+        run: python3 scripts/sync_menu_bas.py
+
+      - name: Commit if the public menu changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add MENU_BAS.pdf
+          if git diff --cached --quiet; then
+            echo "MENU_BAS.pdf already matches the current time slot"
+            exit 0
+          fi
+          git commit -m "Sync MENU_BAS.pdf prices for current Tunisia time"
+          git pull --rebase --autostash origin main
+          git push
