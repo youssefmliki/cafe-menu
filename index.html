@@ -28,18 +28,9 @@
     }
     h1 { margin: 0 0 8px; font-size: 1.7rem; }
     p { margin: 0 0 18px; color: #555; line-height: 1.45; }
-    .slot {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: #111;
-      color: #fff;
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
-    }
     a {
       display: block;
+      margin-top: 10px;
       padding: 14px 16px;
       border-radius: 12px;
       background: #111;
@@ -52,39 +43,9 @@
 <body>
   <main>
     <h1>Nahawand</h1>
-    <p id="status">Ouverture du menu…</p>
-    <div class="slot" id="slot"></div>
-    <a id="open" href="MENU_BAS.pdf">Ouvrir le menu</a>
+    <p>Choisissez le menu de la salle.</p>
+    <a href="MENU_BAS.pdf">Menu Bas</a>
+    <a href="MENU_HAUT.pdf">Menu Haut</a>
   </main>
-  <script>
-    const TZ = "Africa/Tunis";
-
-    function tunisiaNow() {
-      const parts = new Intl.DateTimeFormat("en-GB", {
-        timeZone: TZ,
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-      }).formatToParts(new Date());
-      const value = (type) => Number(parts.find((part) => part.type === type).value);
-      return { hour: value("hour"), minute: value("minute") };
-    }
-
-    function isEvening() {
-      const { hour, minute } = tunisiaNow();
-      const minutes = hour * 60 + minute;
-      return minutes >= 17 * 60 && minutes < 23 * 60 + 58;
-    }
-
-    const evening = isEvening();
-    const href = evening ? "MENU_HAUT.pdf" : "source/MENU_BAS_JOUR.pdf";
-    const label = evening ? "Menu soir (17h–23h58)" : "Menu jour";
-    document.getElementById("slot").textContent = label;
-    document.getElementById("status").textContent = evening
-      ? "Prix du Menu Haut jusqu’à 23h58."
-      : "Prix du Menu Bas.";
-    document.getElementById("open").href = href + "?t=" + Date.now();
-    window.location.replace(href + "?t=" + Date.now());
-  </script>
 </body>
 </html>

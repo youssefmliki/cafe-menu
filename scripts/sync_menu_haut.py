@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish MENU_BAS.pdf with day or evening prices (Africa/Tunis)."""
+"""Publish MENU_HAUT.pdf as Menu Bas from 17:00 to 00:00 (Africa/Tunis)."""
 
 from __future__ import annotations
 
@@ -10,12 +10,11 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-JOUR = ROOT / "source" / "MENU_BAS_JOUR.pdf"
-SOIR = ROOT / "MENU_HAUT.pdf"
-TARGET = ROOT / "MENU_BAS.pdf"
+HAUT_ORIGINAL = ROOT / "source" / "MENU_HAUT_ORIGINAL.pdf"
+MENU_BAS = ROOT / "MENU_BAS.pdf"
+TARGET = ROOT / "MENU_HAUT.pdf"
 TZ = ZoneInfo("Africa/Tunis")
 EVENING_START = 17 * 60
-EVENING_END = 23 * 60 + 58
 
 
 def is_evening(now: datetime | None = None) -> bool:
@@ -25,7 +24,7 @@ def is_evening(now: datetime | None = None) -> bool:
     else:
         current = current.astimezone(TZ)
     minutes = current.hour * 60 + current.minute
-    return EVENING_START <= minutes < EVENING_END
+    return minutes >= EVENING_START
 
 
 def file_hash(path: Path) -> str:
@@ -38,19 +37,21 @@ def file_hash(path: Path) -> str:
 
 def main() -> int:
     evening = is_evening()
-    source = SOIR if evening else JOUR
-    slot = "soir" if evening else "jour"
+    source = MENU_BAS if evening else HAUT_ORIGINAL
+    slot = "bas" if evening else "haut"
     now = datetime.now(TZ).strftime("%Y-%m-%d %H:%M")
 
-    if not source.exists():
-        raise SystemExit(f"Missing source file: {source}")
+    if not MENU_BAS.exists():
+        raise SystemExit(f"Missing source file: {MENU_BAS}")
+    if not HAUT_ORIGINAL.exists():
+        raise SystemExit(f"Missing source file: {HAUT_ORIGINAL}")
 
     if TARGET.exists() and file_hash(TARGET) == file_hash(source):
-        print(f"{now} Africa/Tunis — already {slot}")
+        print(f"{now} Africa/Tunis — MENU_HAUT.pdf already {slot}")
         return 0
 
     shutil.copyfile(source, TARGET)
-    print(f"{now} Africa/Tunis — MENU_BAS.pdf <- {source.name} ({slot})")
+    print(f"{now} Africa/Tunis — MENU_HAUT.pdf <- {source.name} ({slot})")
     return 0
 
 
