@@ -2,14 +2,17 @@ name: Sync Menu Haut
 
 # Tunisia = UTC+1 (no DST):
 # 17:00 Tunis = 16:00 UTC | 00:00 Tunis = 23:00 UTC
+# GitHub cron can lag 5–20 min, so we fire at the hour and keep a 10-min backup.
 on:
   schedule:
     - cron: "0 16 * * *"
-    - cron: "5 16 * * *"
+    - cron: "10 16 * * *"
     - cron: "0 23 * * *"
-    - cron: "5 23 * * *"
-    - cron: "*/15 * * * *"
+    - cron: "10 23 * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch:
+  repository_dispatch:
+    types: [sync-menu]
   push:
     branches: [main]
     paths:
