@@ -1,14 +1,15 @@
 name: Sync Menu Haut
 
+# Tunisia = UTC+1 (no DST):
+# 17:00 Tunis = 16:00 UTC | 00:00 Tunis = 23:00 UTC
 on:
   schedule:
-    - cron: "*/5 * * * *"
     - cron: "0 16 * * *"
+    - cron: "5 16 * * *"
     - cron: "0 23 * * *"
-    - cron: "0 0 * * *"
+    - cron: "5 23 * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
-  repository_dispatch:
-    types: [sync-menu]
   push:
     branches: [main]
     paths:
@@ -19,11 +20,10 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: sync-menu-haut
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   sync:
@@ -47,14 +47,3 @@ jobs:
           git commit -m "Sync MENU_HAUT.pdf for current Tunisia time"
           git pull --rebase --autostash origin main
           git push
-
-      - name: Queue the next check
-        env:
-          GH_TOKEN: ${{ secrets.MENU_SYNC_TOKEN }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "MENU_SYNC_TOKEN missing — schedule/keep-alive will still retry"
-            exit 0
-          fi
-          sleep 90
-          gh workflow run "Sync Menu Haut" --repo youssefmliki/cafe-menu --ref main

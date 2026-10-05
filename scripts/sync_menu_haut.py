@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import shutil
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -15,9 +15,6 @@ MENU_BAS = ROOT / "MENU_BAS.pdf"
 TARGET = ROOT / "MENU_HAUT.pdf"
 TZ = ZoneInfo("Africa/Tunis")
 EVENING_START = 17 * 60
-TEST_NIGHT = date(2026, 9, 27)
-TEST_START = 1 * 60
-TEST_END = 1 * 60 + 20
 
 
 def is_evening(now: datetime | None = None) -> bool:
@@ -27,8 +24,6 @@ def is_evening(now: datetime | None = None) -> bool:
     else:
         current = current.astimezone(TZ)
     minutes = current.hour * 60 + current.minute
-    if current.date() == TEST_NIGHT and TEST_START <= minutes < TEST_END:
-        return True
     return minutes >= EVENING_START
 
 
